@@ -1,11 +1,21 @@
-import { Bell, Moon, Sun } from "lucide-react";
+import { Bell, Moon, Sun, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 export const DashboardHeader = () => {
   const [isDark, setIsDark] = useState(true);
   const [greeting, setGreeting] = useState("");
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -57,12 +67,30 @@ export const DashboardHeader = () => {
             <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent rounded-full"></span>
           </Button>
 
-          <Avatar className="h-9 w-9 ring-2 ring-primary/20">
-            <AvatarImage src="/placeholder.svg" />
-            <AvatarFallback className="bg-gradient-primary text-primary-foreground">
-              CC
-            </AvatarFallback>
-          </Avatar>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="relative h-9 w-9 rounded-full p-0">
+                <Avatar className="h-9 w-9 ring-2 ring-primary/20">
+                  <AvatarImage src="/placeholder.svg" />
+                  <AvatarFallback className="bg-gradient-primary text-primary-foreground">
+                    {user?.email?.charAt(0).toUpperCase() || <User className="w-4 h-4" />}
+                  </AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem className="text-sm font-medium">
+                {user?.email}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={async () => {
+                await signOut();
+                navigate('/');
+              }}>
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>
